@@ -218,7 +218,9 @@
           parent->blocks (group-by (fn [x] (:db/id (x :block/parent))) filtered-ref-blocks)
           result (->> (group-by :block/page filtered-top-blocks)
                       (map (fn [[page blocks]]
-                             (let [blocks (sort-by (fn [b] (not= (:db/id page) (:db/id (:block/parent b)))) blocks)
+                             (let [blocks (->> blocks
+                                                (sort-by :db/id)
+                                                (sort-by (fn [b] (not= (:db/id page) (:db/id (:block/parent b))))))
                                    result (map (fn [block]
                                                  (let [filtered-children (get-filtered-children block parent->blocks)
                                                        refs (when-not (contains? top-level-blocks-ids (:db/id (:block/parent block)))

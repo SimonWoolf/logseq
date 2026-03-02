@@ -3526,8 +3526,10 @@
            (fn []
              (let [alias? (:block/alias? page)
                    page (db/entity (:db/id page))
-                   ;; FIXME: parents need to be sorted
-                   parent-blocks (group-by :block/parent page-blocks)]
+                   parent-blocks (->> (group-by :block/parent page-blocks)
+                                     (map (fn [[parent blocks]]
+                                            [parent (sort-by :db/id blocks)]))
+                                     (sort-by (comp :db/id first)))]
                [:div.my-2.references-blocks-item {:key (str "page-" (:db/id page))}
                 (ui/foldable
                  [:div
