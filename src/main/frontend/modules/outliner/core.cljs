@@ -646,9 +646,10 @@
   (let [right-node (tree/-get-right node)]
     (tree/-del node txs-state children?)
     (when (tree/satisfied-inode? right-node)
-      (let [left-node (tree/-get-left node)
-            new-right-node (tree/-set-left-id right-node (tree/-get-id left-node))]
-        (tree/-save new-right-node txs-state)))
+      (let [left-id (tree/-get-id (tree/-get-left node))
+            right-id (:db/id (:data right-node))]
+        (swap! txs-state conj {:db/id right-id
+                                :block/left [:block/uuid left-id]})))
     @txs-state))
 
 (defn delete-blocks
@@ -697,8 +698,8 @@
                                                  :end-node-left-nodes end-node-left-nodes}))
                                  result))]
             (assert left-node-id "Can't find the left-node-id")
-            (let [new-right-node (tree/-set-left-id right-node left-node-id)]
-              (tree/-save new-right-node txs-state))))
+            (swap! txs-state conj {:db/id (:db/id (:data right-node))
+                                    :block/left [:block/uuid left-node-id]})))
         (doseq [id block-ids]
           (let [node (block (db/pull id))]
             (tree/-del node txs-state true)))
