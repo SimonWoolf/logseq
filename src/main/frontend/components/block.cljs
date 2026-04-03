@@ -3468,6 +3468,7 @@
         navigating-block-entity (db/entity [:block/uuid navigating-block])
         navigated? (and
                     navigating-block
+                    navigating-block-entity
                     (not= (:db/id (:block/parent (::initial-block state)))
                           (:db/id (:block/parent navigating-block-entity))))
         blocks (if navigated?
